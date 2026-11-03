@@ -51,45 +51,41 @@ a{color:inherit}
 
 .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
 
-/* keep the deck above the moving gradient field */
-.deck{position:relative;z-index:1}
-
 /* ============================================================ FULL-PAGE SLIDE DECK */
-.deck{height:100dvh;overflow-y:scroll;overflow-x:hidden;scroll-snap-type:y mandatory;
-  scroll-behavior:smooth;scrollbar-width:none}
+:root{--nav-h:72px}
+.deck{position:relative;z-index:1;height:100vh;height:100dvh;overflow-y:scroll;overflow-x:hidden;
+  scroll-snap-type:y mandatory;scroll-behavior:smooth;scrollbar-width:none}
 .deck::-webkit-scrollbar{display:none}
-.slide{position:relative;height:100dvh;overflow-y:auto;overflow-x:hidden;
+/* snapping stays on at all sizes: slides taller than the screen scroll internally, so they never trap */
+.slide{position:relative;height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;padding-top:var(--nav-h);
   scroll-snap-align:start;scroll-snap-stop:always;
   display:flex;flex-direction:column;scrollbar-width:none}
 .slide::-webkit-scrollbar{display:none}
-.slide-inner{width:100%;max-width:1180px;margin:auto;padding:clamp(46px,8vh,92px) 28px}
+.slide-inner{width:100%;max-width:1180px;margin:auto;padding:clamp(40px,7vh,84px) 28px}
+.slide-tight .slide-inner{padding-top:clamp(16px,3vh,32px);padding-bottom:clamp(16px,3vh,32px)}
 .slide .section{margin-top:0}
 .slide .stats{margin-top:0}
-.slide-hero .topbar{flex:0 0 auto}
 .slide-hero .hero{padding:0}
 .hero-stack{display:flex;flex-direction:column;gap:clamp(28px,5vh,56px)}
 .slide-campaigns .section + .section{margin-top:clamp(40px,6vh,72px)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:4px}
 
-.deck-dots{position:fixed;top:50%;right:22px;transform:translateY(-50%);z-index:1000;
-  display:flex;flex-direction:column;gap:14px}
-.deck-dots button{width:11px;height:11px;border-radius:50%;border:1px solid var(--ink-faint);
-  background:transparent;cursor:pointer;padding:0;
-  transition:transform .3s ease,background .3s ease,border-color .3s ease}
-.deck-dots button:hover{border-color:var(--ink)}
-.deck-dots button.active{background:var(--ink);border-color:var(--ink);transform:scale(1.25)}
-
-/* snapping stays on at all sizes (slides scroll internally so they never trap);
-   only hide the side dots where they'd crowd a very narrow screen */
-@media (max-width:560px){
-  .deck-dots{display:none}
-}
+/* ============================================================ PINNED HEADER + PROGRESS LINE */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(255,255,255,.42);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.6)}
+.scroll-progress{position:absolute;top:0;left:0;height:4px;width:100%;transform:scaleX(0);transform-origin:left;
+  background:linear-gradient(90deg,var(--ink),var(--sky));border-radius:0 4px 4px 0;pointer-events:none;
+  transition:transform .12s linear}
 
 /* ============================================================
    Moving soft-gradient field (brand colours) + custom cursor
    ============================================================ */
-.bg-field{position:fixed;inset:-30px;z-index:0;overflow:hidden;pointer-events:none;will-change:transform}
-.scroll-progress{position:fixed;top:0;left:0;height:3px;width:100%;transform:scaleX(0);transform-origin:left;
-  background:linear-gradient(90deg,var(--ink),var(--sky));z-index:1100;pointer-events:none;will-change:transform}
+/* Ambient glow layer. It is taller than the screen (JS sets the height) and is moved by JS at 30% of the
+   deck's scroll speed, so it drifts behind the content for a parallax effect. Blobs are spread down its length. */
+.bg-field{position:fixed;left:-30px;right:-30px;top:0;height:calc(100vh + 60px);z-index:0;overflow:hidden;pointer-events:none;
+  will-change:transform;opacity:0;transition:opacity 1.4s cubic-bezier(.16,1,.3,1) .6s}
+.hero-ready .bg-field{opacity:1}
 .blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.62;will-change:transform}
 .blob-1{width:50vw;height:50vw;left:-10vw;top:-8vw;
   background:radial-gradient(circle at 50% 50%, rgba(132,205,238,.9), rgba(132,205,238,0) 68%);
@@ -97,12 +93,15 @@ a{color:inherit}
 .blob-2{width:44vw;height:44vw;right:-8vw;top:16vw;
   background:radial-gradient(circle at 50% 50%, rgba(207,234,251,.95), rgba(207,234,251,0) 70%);
   animation:drift2 40s ease-in-out infinite}
-.blob-3{width:42vw;height:42vw;left:22vw;bottom:-12vw;
+.blob-3{width:42vw;height:42vw;left:22vw;top:34%;
   background:radial-gradient(circle at 50% 50%, rgba(27,41,120,.16), rgba(27,41,120,0) 70%);
   animation:drift3 46s ease-in-out infinite}
-.blob-4{width:36vw;height:36vw;right:12vw;bottom:4vw;
-  background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.92), rgba(255,255,255,0) 66%);
-  animation:drift1 30s ease-in-out infinite reverse}
+.blob-4{width:46vw;height:46vw;right:-10vw;top:56%;
+  background:radial-gradient(circle at 50% 50%, rgba(132,205,238,.85), rgba(132,205,238,0) 68%);
+  animation:drift2 38s ease-in-out infinite}
+.blob-5{width:40vw;height:40vw;left:-8vw;top:78%;
+  background:radial-gradient(circle at 50% 50%, rgba(207,234,251,.95), rgba(207,234,251,0) 70%);
+  animation:drift1 42s ease-in-out infinite}
 @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(8vw,6vw) scale(1.12)}}
 @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-7vw,5vw) scale(1.08)}}
 @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(6vw,-6vw) scale(1.15)}}
@@ -114,33 +113,42 @@ a{color:inherit}
   color:var(--ink);
 }
 /* ---- reveal animation ---- */
-.reveal{opacity:0;transform:translateY(20px);
-  transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
+/* all entrances share the spring ease-out curve */
+.reveal{opacity:0;transform:translateY(24px);
+  transition:opacity .9s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1)}
 .reveal.in{opacity:1;transform:none}
 .stagger>*{opacity:0;transform:translateY(22px);
-  transition:opacity .75s ease, transform .75s cubic-bezier(.2,.7,.2,1)}
+  transition:opacity .8s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1)}
 .stagger.in>*{opacity:1;transform:none}
-.stagger.in>*:nth-child(2){transition-delay:.07s}
-.stagger.in>*:nth-child(3){transition-delay:.14s}
-.stagger.in>*:nth-child(4){transition-delay:.21s}
-.stagger.in>*:nth-child(5){transition-delay:.28s}
-.stagger.in>*:nth-child(6){transition-delay:.35s}
+.stagger.in>*:nth-child(2){transition-delay:.08s}
+.stagger.in>*:nth-child(3){transition-delay:.16s}
+.stagger.in>*:nth-child(4){transition-delay:.24s}
+.stagger.in>*:nth-child(5){transition-delay:.32s}
+.stagger.in>*:nth-child(6){transition-delay:.40s}
+
+/* children rise one after another once their section is revealed */
+.contact .contact-card,.contact .reach-label,.contact .reach-card{
+  opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.contact.in .contact-card,.contact.in .reach-label,.contact.in .reach-card{opacity:1;transform:none}
+.contact.in .contact-card{transition-delay:.15s}
+.contact.in .reach-label{transition-delay:.28s}
+.contact.in .reach-card:nth-of-type(1){transition-delay:.36s}
+.contact.in .reach-card:nth-of-type(2){transition-delay:.46s}
+.feature .feature-text,.feature .feature-visual{opacity:0;transform:translateY(22px);
+  transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.feature.in .feature-text,.feature.in .feature-visual{opacity:1;transform:none}
+.feature.in .feature-text{transition-delay:.15s}
+.feature.in .feature-visual{transition-delay:.3s}
 
 /* ============================================================ TOP BAR */
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:26px 28px;max-width:1180px;margin:0 auto;
-}
-.mark{font-family:var(--display);font-weight:400;letter-spacing:-.02em;font-size:1.05rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;height:var(--nav-h);padding:0 28px;width:100%;max-width:1180px;margin:0 auto}
+.mark{font-family:var(--display);font-weight:400;letter-spacing:-.02em;font-size:1.05rem;text-decoration:none}
 .mark b{font-weight:500}
-.mark-tag{
-  display:inline-block;text-decoration:none;
-  font-size:.72rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
-  color:var(--ink-soft);border:1px solid var(--line);border-radius:100px;
-  padding:7px 14px;background:var(--glass-2);backdrop-filter:blur(8px);
-  transition:color .3s ease,border-color .3s ease,background .3s ease
-}
-.mark-tag:hover{color:var(--ink);border-color:var(--ink-faint);background:rgba(255,255,255,.6)}
+.nav{display:flex;gap:26px;font-size:.88rem;font-weight:500}
+.nav a{position:relative;text-decoration:none;color:var(--ink-soft);padding:6px 0;transition:color .25s}
+.nav a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.nav a:hover,.nav a.active{color:var(--ink)}
+.nav a.active::after{transform:scaleX(1)}
 
 /* ============================================================ HERO */
 .hero{padding:clamp(46px,9vw,104px) 0 clamp(34px,5vw,58px)}
@@ -150,6 +158,17 @@ a{color:inherit}
   margin-top:26px;color:var(--ink)
 }
 .hero-title em{font-style:normal;color:var(--ink-faint)}
+
+/* hero entrance: the headline builds letter by letter (each character on its own --d delay, set by the
+   script), then the stats panel and the background glow follow, all on the spring ease-out curve */
+.hero-line{display:block}
+.hero-title .w{display:inline-block;white-space:nowrap}      /* keeps words from breaking mid-word */
+.hero-title .ch{display:inline-block;opacity:0;transform:translateY(30px);
+  transition:opacity .8s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1);transition-delay:var(--d,0s)}
+.hero-ready .hero-title .ch{opacity:1;transform:none}
+.hero-anim{opacity:0;transform:translateY(30px);
+  transition:opacity .9s cubic-bezier(.16,1,.3,1),transform 1.1s cubic-bezier(.16,1,.3,1)}
+.hero-ready .hero-anim{opacity:1;transform:none}
 
 /* ============================================================ STATS */
 .stats{
@@ -314,21 +333,49 @@ a{color:inherit}
 .flow-metric .mv{font-family:var(--display);font-weight:300;font-size:1.28rem;letter-spacing:-.02em;color:var(--ink)}
 
 /* ============================================================ CONTACT / FOOTER */
-.contact{
-  margin-top:clamp(96px,14vw,180px);text-align:center;
-  padding:clamp(48px,7vw,96px) 0 clamp(40px,5vw,64px)
-}
-.contact-title{
-  font-family:var(--display);font-weight:200;letter-spacing:-.035em;line-height:1.04;
-  font-size:clamp(2.1rem,5.4vw,4rem);margin-top:18px
-}
-.contact-link{
-  display:inline-block;margin-top:28px;font-family:var(--display);font-weight:300;
-  font-size:clamp(1.3rem,3vw,2rem);letter-spacing:-.02em;text-decoration:none;color:var(--ink);
-  border-bottom:1px solid var(--line);padding-bottom:6px;transition:border-color .3s ease,color .3s ease
-}
-.contact-link:hover{border-color:var(--ink);color:#22307f}
-.contact-foot{margin-top:46px;font-size:.8rem;color:var(--ink-faint);letter-spacing:.04em}
+.contact h2{font-family:var(--display);font-weight:200;font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.04;letter-spacing:-.035em}
+.contact-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:clamp(20px,3vw,36px);margin-top:clamp(24px,4vh,40px);align-items:start}
+
+/* form card */
+.contact-card{border-radius:22px;padding:clamp(20px,2.6vw,30px);display:grid;gap:14px}
+.contact-intro{color:var(--ink-soft);font-size:.98rem;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:grid;gap:8px}
+.field span{font-weight:600;font-size:.9rem}
+.field input,.field textarea{width:100%;font:inherit;font-size:.95rem;color:var(--ink);
+  background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+  transition:border-color .25s ease,box-shadow .25s ease,background .25s ease}
+.field textarea{resize:vertical;min-height:96px}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--ink);background:#fff;box-shadow:0 0 0 4px rgba(132,205,238,.45)}
+.field input:user-invalid,.field textarea:user-invalid{border-color:#c2410c}
+.send{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:none;cursor:pointer;
+  font:inherit;font-weight:600;font-size:1rem;color:#fff;padding:15px 20px;border-radius:12px;
+  background:linear-gradient(90deg,var(--ink),#3a57c4);box-shadow:0 18px 34px -18px rgba(27,41,120,.8);
+  transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s ease}
+.send:hover{transform:translateY(-2px);box-shadow:0 22px 40px -18px rgba(27,41,120,.9)}
+.send svg{width:18px;height:18px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linejoin:round}
+.form-note{min-height:1.2em;font-size:.86rem;color:var(--ink-soft)}
+.form-note:empty{display:none}
+
+/* reach-me cards */
+.reach{display:grid;gap:14px}
+.reach-label{font-size:.74rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:2px}
+.reach-card{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:16px;text-decoration:none;
+  transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s ease}
+.reach-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.reach-ic{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:rgba(132,205,238,.28);border:1px solid rgba(27,41,120,.12)}
+.reach-ic svg{width:20px;height:20px;stroke:var(--ink);stroke-width:1.7;fill:none}
+.reach-ic svg.filled{fill:var(--ink);stroke:none}
+.reach-text{display:grid;gap:2px;min-width:0}
+.reach-text small{font-size:.8rem;color:var(--ink-soft)}
+.reach-text b{font-weight:600;font-size:.98rem;overflow-wrap:anywhere}
+.glass{background:var(--glass);backdrop-filter:blur(18px);border:1px solid var(--glass-border);box-shadow:var(--shadow-sm)}
+
+.contact-foot{margin-top:clamp(24px,4vh,40px);font-size:.8rem;color:var(--ink-faint);letter-spacing:.04em}
+
+@media (max-width:900px){ .contact-grid{grid-template-columns:1fr} }
+@media (max-width:640px){ .field-row{grid-template-columns:1fr} .nav{display:none} }
 
 /* ============================================================ RESPONSIVE */
 @media (max-width:860px){
@@ -338,12 +385,14 @@ a{color:inherit}
   .stats{grid-template-columns:repeat(2,1fr)}
   .stat:nth-child(odd){border-left:none}
   .stat:nth-child(n+3){border-top:1px solid var(--line)}
-  .topbar{padding:20px}
-  .wrap{padding:0 20px}
+  .topbar{padding:0 20px}
+  .slide-inner{padding-left:20px;padding-right:20px}
 }
 @media (prefers-reduced-motion:reduce){
-  *{scroll-behavior:auto}
-  .reveal,.stagger>*{opacity:1!important;transform:none!important;transition:none!important}
+  .deck{scroll-behavior:auto}
+  .reveal,.stagger>*,.hero-anim,.bg-field,.hero-title .ch,
+  .feature .feature-text,.feature .feature-visual,
+  .contact .contact-card,.contact .reach-label,.contact .reach-card{opacity:1!important;transform:none!important;transition:none!important}
   .blob{animation:none!important}
 }
 </style>
@@ -355,27 +404,39 @@ a{color:inherit}
   <span class="blob blob-2"></span>
   <span class="blob blob-3"></span>
   <span class="blob blob-4"></span>
+  <span class="blob blob-5"></span>
 </div>
 
-<div class="scroll-progress" aria-hidden="true"></div>
+<header class="site-header">
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <nav class="topbar" aria-label="Main">
+    <a class="mark" href="#top"><b>Dilshi</b> Sumedha</a>
+    <div class="nav">
+      <a href="#campaigns">Campaigns</a>
+      <a href="#deliverability">Deliverability</a>
+      <a href="#flows">Flows</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+</header>
 
 <main class="deck">
 
   <!-- ===== SLIDE 1 · Hero + key metrics ===== -->
-  <section class="slide slide-hero">
-    <nav class="topbar">
-      <span class="mark"><b>Dilshi</b> Sumedha</span>
-      <a class="mark-tag" href="index.html">← Back to portfolio</a>
-    </nav>
+  <section class="slide slide-hero" id="top">
     <div class="slide-inner hero-stack">
 
       <!-- ===================== HERO ===================== -->
-      <header class="hero reveal">
-    <h1 class="hero-title">Email that earns<br> open, click <em> and the revenue.</em></h1>
+      <!-- the script splits each line into characters for the letter-by-letter entrance -->
+      <header class="hero">
+    <h1 class="hero-title" aria-label="Email that earns open, click and the revenue.">
+      <span class="hero-line" aria-hidden="true">Email that earns</span>
+      <span class="hero-line" aria-hidden="true">open, click <em>and the revenue.</em></span>
+    </h1>
   </header>
 
   <!-- ===================== STATS ===================== -->
-  <section class="stats reveal" aria-label="Key results">
+  <section class="stats hero-anim" aria-label="Key results">
     <div class="stat"><span class="stat-num">200+</span><span class="stat-label">Campaigns managed</span></div>
     <div class="stat"><span class="stat-num">75%</span><span class="stat-label">Avg. open rate</span></div>
     <div class="stat"><span class="stat-num">5.4%</span><span class="stat-label">Avg. click rate</span></div>
@@ -385,7 +446,7 @@ a{color:inherit}
   </section>
 
   <!-- ===== SLIDE 2 · Campaigns ===== -->
-  <section class="slide slide-campaigns">
+  <section class="slide slide-campaigns" id="campaigns">
     <div class="slide-inner">
 
       <!-- ===================== EXPERTISE ===================== -->
@@ -427,7 +488,7 @@ a{color:inherit}
       <div class="brand open">
         <button class="brand-head" type="button" aria-expanded="true">
           <span class="brand-id">
-            <span class="brand-name">Case Study 1</span>
+            <span class="brand-name">Spa Ceylon</span>
             <span class="brand-market">Sri Lanka · Luxury wellness</span>
           </span>
           <svg class="brand-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -443,14 +504,14 @@ a{color:inherit}
       <div class="brand">
         <button class="brand-head" type="button" aria-expanded="false">
           <span class="brand-id">
-            <span class="brand-name">Case Study 2</span>
+            <span class="brand-name">Spa Ceylon</span>
             <span class="brand-market">United Kingdom · International expansion</span>
           </span>
           <svg class="brand-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="brand-collapse"><div class="brand-collapse-inner">
           <div class="brand-content">
-            <p class="brand-scope"><strong>Scope.</strong> Monthly deliverability tracking for a premium spa brand's UK programme — inbox placement, sender reputation, and engagement monitored month over month. Select a month below to view its deliverability report.</p>
+            <p class="brand-scope"><strong>Scope.</strong> Monthly deliverability tracking for Spa Ceylon's UK programme — inbox placement, sender reputation, and engagement monitored month over month. Select a month below to view its deliverability report.</p>
             <div class="email-grid" id="spa-uk-grid"><!-- rendered by script --></div>
           </div>
         </div></div>
@@ -459,14 +520,14 @@ a{color:inherit}
       <div class="brand">
         <button class="brand-head" type="button" aria-expanded="false">
           <span class="brand-id">
-            <span class="brand-name">Case Study 3</span>
+            <span class="brand-name">Spa Ceylon</span>
             <span class="brand-market">India · Regional market</span>
           </span>
           <svg class="brand-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="brand-collapse"><div class="brand-collapse-inner">
           <div class="brand-content">
-            <p class="brand-scope"><strong>Scope.</strong> Email marketing for a premium spa brand's India market — newsletters, product highlights, and promotional campaigns tailored to regional audiences and partner offers. Select a category below to preview the campaign design.</p>
+            <p class="brand-scope"><strong>Scope.</strong> Email marketing for Spa Ceylon's India market — newsletters, product highlights, and promotional campaigns tailored to regional audiences and partner offers. Select a category below to preview the campaign design.</p>
             <div class="email-grid" id="spa-in-grid"><!-- rendered by script --></div>
           </div>
         </div></div>
@@ -475,14 +536,14 @@ a{color:inherit}
       <div class="brand">
         <button class="brand-head" type="button" aria-expanded="false">
           <span class="brand-id">
-            <span class="brand-name">Case Study 4</span>
+            <span class="brand-name">Spa Ceylon</span>
             <span class="brand-market">UAE · Premium market</span>
           </span>
           <svg class="brand-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
         </button>
         <div class="brand-collapse"><div class="brand-collapse-inner">
           <div class="brand-content">
-            <p class="brand-scope"><strong>Scope.</strong> Email marketing for a premium spa brand's UAE market — product launches, newsletters, personalisation, and re-engagement campaigns for a premium audience. Select a category below to preview the campaign design.</p>
+            <p class="brand-scope"><strong>Scope.</strong> Email marketing for Spa Ceylon's UAE market — product launches, newsletters, personalisation, and re-engagement campaigns for a premium audience. Select a category below to preview the campaign design.</p>
             <div class="email-grid" id="spa-uae-grid"><!-- rendered by script --></div>
           </div>
         </div></div>
@@ -491,7 +552,7 @@ a{color:inherit}
       <div class="brand">
         <button class="brand-head" type="button" aria-expanded="false">
           <span class="brand-id">
-            <span class="brand-name">Case Study 5</span>
+            <span class="brand-name">Janet</span>
             <span class="brand-market">Beauty &amp; cosmetics</span>
           </span>
           <svg class="brand-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -506,7 +567,7 @@ a{color:inherit}
       <div class="brand">
         <button class="brand-head" type="button" aria-expanded="false">
           <span class="brand-id">
-            <span class="brand-name">Case Study 6</span>
+            <span class="brand-name">LuvEsence</span>
             <span class="brand-market">Skincare &amp; wellness</span>
           </span>
           <svg class="brand-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -523,7 +584,7 @@ a{color:inherit}
   </section>
 
   <!-- ===== SLIDE 3 · Deliverability ===== -->
-  <section class="slide slide-deliver">
+  <section class="slide slide-deliver" id="deliverability">
     <div class="slide-inner">
 
       <!-- ===================== DELIVERABILITY ===================== -->
@@ -545,7 +606,7 @@ a{color:inherit}
   </section>
 
   <!-- ===== SLIDE 4 · Flows ===== -->
-  <section class="slide slide-flows">
+  <section class="slide slide-flows" id="flows">
     <div class="slide-inner">
 
       <!-- ===================== FLOWS ===================== -->
@@ -594,27 +655,48 @@ a{color:inherit}
   </section>
 
   <!-- ===== SLIDE 5 · Contact ===== -->
-  <section class="slide slide-footer">
+  <section class="slide slide-footer slide-tight" id="contact">
     <div class="slide-inner">
 
       <!-- ===================== CONTACT ===================== -->
       <footer class="contact reveal">
-    <h2 class="contact-title">Have a list that<br>could do more?</h2>
-    <a class="contact-link" href="mailto:dilshisumedha17@gmail.com">dilshisumedha17@gmail.com</a>
-    <p class="contact-foot">© 2026 Dilshi Sumedha · Email Marketing &amp; Lifecycle</p>
+        <h2>Let's connect</h2>
+
+        <div class="contact-grid">
+          <!-- No server: on submit this opens the visitor's email app with the message filled in -->
+          <form class="contact-card glass" id="contact-form" novalidate>
+            <p class="contact-intro">Open to freelance projects, consulting, and CRM-related opportunities. Send a message — I usually reply within 24 hours.</p>
+            <div class="field-row">
+              <label class="field"><span>Name</span><input name="name" type="text" autocomplete="name" required></label>
+              <label class="field"><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
+            </div>
+            <label class="field"><span>Message</span><textarea name="message" rows="4" required></textarea></label>
+            <button class="send" type="submit">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+              Send Message
+            </button>
+            <p class="form-note" aria-live="polite"></p>
+          </form>
+
+          <aside class="reach">
+            <p class="reach-label">Or reach me on</p>
+            <a class="reach-card glass" href="mailto:dilshisumedha17@gmail.com">
+              <span class="reach-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+              <span class="reach-text"><small>Contact me via email:</small><b>dilshisumedha17@gmail.com</b></span>
+            </a>
+            <a class="reach-card glass" href="https://www.linkedin.com/in/dilshi-sumedha-8b233a220" target="_blank" rel="noopener">
+              <span class="reach-ic"><svg viewBox="0 0 24 24" aria-hidden="true" class="filled"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></span>
+              <span class="reach-text"><small>LinkedIn</small><b>/in/dilshi-sumedha-8b233a220</b></span>
+            </a>
+          </aside>
+        </div>
+
+        <p class="contact-foot">© 2026 Dilshi Sumedha · Email Marketing &amp; Lifecycle</p>
       </footer>
     </div>
   </section>
 
 </main>
-
-<aside class="deck-dots" aria-label="Section navigation">
-  <button type="button" title="Home" class="active"></button>
-  <button type="button" title="Campaigns"></button>
-  <button type="button" title="Deliverability"></button>
-  <button type="button" title="Flows"></button>
-  <button type="button" title="Contact"></button>
-</aside>
 
 <div class="lightbox" aria-hidden="true"><img alt=""></div>
 
@@ -622,7 +704,7 @@ a{color:inherit}
 (function(){
   'use strict';
 
-  /* ---- Case Study 1 — Sri Lanka campaign categories ---- */
+  /* ---- Spa Ceylon — Sri Lanka campaign categories ---- */
   var spaCeylonLK = [
     {name:'Gramification',      img:'assets/spa-ceylon/gramification.png'},
     {name:'Newsletters',        img:'assets/spa-ceylon/newsletters.png'},
@@ -631,7 +713,7 @@ a{color:inherit}
     {name:'VIP Offers',         img:'assets/spa-ceylon/vip-offers.png'}
   ];
 
-  /* ---- Case Study 3 — India campaign categories ---- */
+  /* ---- Spa Ceylon — India campaign categories ---- */
   var spaCeylonIN = [
     {name:'Mind Blowing',       img:'assets/spa-ceylon-in/mind-blowing.png'},
     {name:'Newsletters',        img:'assets/spa-ceylon-in/newsletters.png'},
@@ -640,7 +722,7 @@ a{color:inherit}
     {name:'Third-Party Promos', img:'assets/spa-ceylon-in/third-party-promos.png'}
   ];
 
-  /* ---- Case Study 2 — UK monthly deliverability ---- */
+  /* ---- Spa Ceylon — UK monthly deliverability ---- */
   var spaCeylonUK = [
     {name:'January',   img:'assets/spa-ceylon-uk/01-january.png'},
     {name:'February',  img:'assets/spa-ceylon-uk/02-february.png'},
@@ -656,7 +738,7 @@ a{color:inherit}
     {name:'December',  img:'assets/spa-ceylon-uk/12-december.png'}
   ];
 
-  /* ---- Case Study 4 — UAE campaign categories ---- */
+  /* ---- Spa Ceylon — UAE campaign categories ---- */
   var spaCeylonUAE = [
     {name:'New Product Launches', img:'assets/spa-ceylon-uae/new-product-launches.png'},
     {name:'Newsletter',           img:'assets/spa-ceylon-uae/newsletter.png'},
@@ -674,7 +756,7 @@ a{color:inherit}
       '<div class="email-collapse"><div class="email-collapse-inner">'+
         '<div class="email-body">'+
           '<div class="email-frame">'+
-            '<img class="email-img" src="'+c.img+'" alt="'+c.name+' — email design" loading="lazy">'+
+            '<img class="email-img" src="'+c.img+'" alt="'+c.name+' — Spa Ceylon email design" loading="lazy">'+
           '</div>'+
         '</div>'+
       '</div></div>'+
@@ -792,28 +874,83 @@ a{color:inherit}
     onScroll();
   }
 
-  /* ---- Slide-position dots (click to jump, active reflects current slide) ---- */
-  function initDots(){
-    var dots = document.querySelectorAll('.deck-dots button');
+  /* ---- Nav: underline the link for the slide on screen; reset a slide to its top when you leave it ---- */
+  function initSlides(){
     var slides = document.querySelectorAll('.slide');
-    if(!dots.length || !slides.length) return;
-    dots.forEach(function(d, i){
-      d.addEventListener('click', function(){
-        if(slides[i]) slides[i].scrollIntoView({behavior:'smooth', block:'start'});
-      });
-    });
-    if(!('IntersectionObserver' in window)) return;
+    var navLinks = document.querySelectorAll('.nav a');
+    if(!slides.length || !('IntersectionObserver' in window)) return;
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
         if(en.isIntersecting){
-          var idx = [].indexOf.call(slides, en.target);
-          dots.forEach(function(d, i){ d.classList.toggle('active', i === idx); });
+          var href = '#' + en.target.id;
+          navLinks.forEach(function(a){
+            var on = a.getAttribute('href') === href;
+            a.classList.toggle('active', on);
+            if(on) a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+          });
         } else {
-          en.target.scrollTop = 0;   /* reset a slide to its top when you leave it */
+          en.target.scrollTop = 0;
         }
       });
     }, {threshold:0.55});
     slides.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ---- Hero headline: wrap every character in its own span with a stepped delay (words and the <em>
+     stay intact), then time the stats panel to follow the last letter ---- */
+  function initHero(){
+    var title = document.querySelector('.hero-title');
+    if(!title) return;
+    var STEP = 0.035, n = 0;
+    function splitInto(el){
+      Array.prototype.slice.call(el.childNodes).forEach(function(node){
+        if(node.nodeType === 1){ splitInto(node); return; }
+        if(node.nodeType !== 3) return;
+        var frag = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach(function(part){
+          if(!part) return;
+          if(/^\s+$/.test(part)){ frag.appendChild(document.createTextNode(' ')); return; }
+          var w = document.createElement('span'); w.className = 'w';
+          Array.prototype.forEach.call(part, function(c){
+            var s = document.createElement('span'); s.className = 'ch'; s.textContent = c;
+            s.style.setProperty('--d', (n++ * STEP).toFixed(3) + 's');
+            w.appendChild(s);
+          });
+          frag.appendChild(w);
+        });
+        el.replaceChild(frag, node);
+      });
+    }
+    title.querySelectorAll('.hero-line').forEach(splitInto);
+    var statsDelay = Math.max(0, n - 1) * STEP + 0.15;
+    var stats = document.querySelector('.stats');
+    if(stats){
+      stats.style.transitionDelay = statsDelay.toFixed(2) + 's';
+      stats.dataset.wait = (statsDelay + 0.3).toFixed(2);   /* count-up starts once the panel has arrived */
+    }
+  }
+
+  /* start the hero entrance after the first paint (timeout is a fallback for delayed animation frames) */
+  function startHero(){
+    function go(){ document.documentElement.classList.add('hero-ready'); }
+    requestAnimationFrame(function(){ requestAnimationFrame(go); });
+    setTimeout(go, 150);
+  }
+
+  /* ---- Contact form: no server, so hand the message to the visitor's email app ---- */
+  function initContactForm(){
+    var form = document.getElementById('contact-form');
+    if(!form) return;
+    var note = form.querySelector('.form-note');
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      if(!form.reportValidity()) return;
+      var name = form.name.value.trim(), email = form.email.value.trim(), msg = form.message.value.trim();
+      var subject = 'Portfolio enquiry from ' + name;
+      var body = msg + '\n\n— ' + name + ' (' + email + ')';
+      window.location.href = 'mailto:dilshisumedha17@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      note.textContent = 'Opening your email app… If nothing happens, email dilshisumedha17@gmail.com directly.';
+    });
   }
 
   /* ---- Count-up stat numbers when they scroll into view ---- */
@@ -841,28 +978,25 @@ a{color:inherit}
       });
     }
     if(!('IntersectionObserver' in window)){ run(); return; }
+    var wait = parseFloat(stats.dataset.wait || 0) * 1000;   /* set by initHero */
     var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){ if(en.isIntersecting){ run(); io.disconnect(); } });
+      entries.forEach(function(en){ if(en.isIntersecting){ setTimeout(run, reduce ? 0 : wait); io.disconnect(); } });
     }, {threshold:0.4});
     io.observe(stats);
   }
 
-  /* ---- Background blobs drift toward the cursor (parallax) ---- */
+  /* ---- Parallax: the ambient glow layer moves at 30% of the deck's scroll speed ---- */
   function initParallax(){
-    if(!window.matchMedia('(hover: hover)').matches) return;
     if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     var field = document.querySelector('.bg-field');
-    if(!field) return;
-    var tx = 0, ty = 0, cx = 0, cy = 0;
-    window.addEventListener('mousemove', function(e){
-      tx = (e.clientX / window.innerWidth  - 0.5) * 30;
-      ty = (e.clientY / window.innerHeight - 0.5) * 30;
-    }, {passive:true});
-    (function loop(){
-      cx += (tx - cx) * 0.06; cy += (ty - cy) * 0.06;
-      field.style.transform = 'translate(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px)';
-      requestAnimationFrame(loop);
-    })();
+    var deck = document.querySelector('.deck');
+    if(!field || !deck) return;
+    var RATE = 0.3, ticking = false;
+    function size(){ field.style.height = (window.innerHeight + (deck.scrollHeight - deck.clientHeight) * RATE + 60) + 'px'; }
+    function apply(){ ticking = false; field.style.transform = 'translate3d(0,' + (-deck.scrollTop * RATE).toFixed(1) + 'px,0)'; }
+    deck.addEventListener('scroll', function(){ if(!ticking){ ticking = true; requestAnimationFrame(apply); } }, {passive:true});
+    window.addEventListener('resize', function(){ size(); apply(); });
+    size(); apply();
   }
 
   /* ---- Subtle 3D tilt + cursor sheen on capability cards ---- */
@@ -904,16 +1038,19 @@ a{color:inherit}
 
   document.addEventListener('DOMContentLoaded', function(){
     renderCampaigns(); // build the category cards first
+    initHero();        // split the headline before anything reads the stats delay
     initBrands();
     initEmails();
     initLightbox();
     initFlowCarousel();
     initProgress();
-    initDots();
+    initSlides();
     initCounters();
     initParallax();
     initTilt();
+    initContactForm();
     initReveal();     // then observe everything, including the new cards
+    startHero();
   });
 })();
 </script>
